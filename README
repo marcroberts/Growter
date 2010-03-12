@@ -1,0 +1,7 @@
+1. Update the SEARCH and AUTH variables in growter.rb
+2. Run with 'ruby growter.rb'
+
+Ensure you have the required gems installed:
+- json
+- eventmachine
+- meow
