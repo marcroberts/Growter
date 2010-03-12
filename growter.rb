@@ -5,12 +5,16 @@ require 'eventmachine'
 require 'em/buftok'
 require 'meow'
 
+require 'net/http'
+
 require 'twitter_stream'
 
 AUTH = 'USER:PASSWORD'
 SEARCH = 'sxsw'
 
 meow = Meow.new('Growter', 'Note', Meow.import_image('twitter.png'))
+
+Dir.mkdir 'avatarcache' unless File.exists?('avatarcache')
 
 EventMachine::run {
   stream = TwitterStream.connect(
@@ -20,9 +24,19 @@ EventMachine::run {
     
   stream.each_item do |msg|
     tweet = JSON.load(msg)
+    screen_name = tweet['user']['screen_name']
     
-    meow.notify "#{tweet['user']['name']} (#{tweet['user']['screen_name']})", tweet['text'] do
-      system "open http://twitter.com/#{tweet['user']['screen_name']}/statuses/#{tweet['id']}"
+    unless File.exists?("avatarcache/#{screen_name}.png")
+      Net::HTTP.start("img.tweetimag.es") { |http|
+        resp = http.get("/i/#{screen_name}_n")
+        open("avatarcache/#{screen_name}.png", "wb") { |file|
+          file.write(resp.body)
+         }
+      }
+    end
+    
+    meow.notify "#{tweet['user']['name']} (#{screen_name})", tweet['text'], :icon => "avatarcache/#{screen_name}.png" do
+      system "open http://twitter.com/#{screen_name}/statuses/#{tweet['id']}"
     end
   end
   

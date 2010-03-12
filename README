@@ -5,3 +5,5 @@ Ensure you have the required gems installed:
 - json
 - eventmachine
 - meow
+
+as well as RubyCocoa - http://rubycocoa.sourceforge.net/HomePage
